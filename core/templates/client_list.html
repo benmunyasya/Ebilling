@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static%}
+{% load humanize %}
+{% block content %}{%include 'nav.html'%}
+{%block css%}
+<!-- Custom fonts for this template -->
+
+<link
+    href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+    rel="stylesheet">
+
+
+
+<!-- Custom styles for this page -->
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+{%endblock css %}
+<div id="content-wrapper" class="d-flex flex-column">
+
+    <!-- Main Content -->
+    <div id="content">
+
+        {% include 'topbar.html' %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+            <!-- Page Heading -->
+            <h1 class="h3 mb-2 text-gray-800"><span><i class="fa fa-users-cog"> Clients</i></span></h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+                    <li class="breadcrumb-item active"><a href="#">Clients</a></li>
+
+                </ol>
+            </nav>
+           
+            <div class="card">
+                <div class="card-body pt-3">
+                    <ul class="nav nav-tabs nav-tabs-bordered">
+
+                        <li class="nav-item">
+                            <button class="nav-link   active" data-toggle="tab" data-target="#client-list"> <span
+                                    class="icon text-dark-50">
+                                    <i class="fa fa-users"></i>
+                                </span>
+                                <span class="text">Client List</span></button>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <button class="nav-link" id="billing_history" data-toggle="tab"
+                                data-target="#add-new-client"><span class="icon text-dark-50">
+                                    <i class="fa fa-user-plus"></i>
+                                </span>
+                                <span class="text">Add Client</span></button></button></button>
+                        </li>
+
+
+
+                    </ul>
+                    <div class="tab-content pt-2">
+                        <div class="tab-pane fade show active profile-overview" id="client-list">
+                            <!-- DataTales Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">List Of Current Clients</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped " id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Metre Number</th>
+                                                    <th>Phone Number</th>
+                                                    <th>Balance C/F</th>
+                                                    <th>Current Bill</th>
+                                                    <th>Delete</th>
+                                                    <th>Edit</th>
+                                                    <th>View Details</th>
+
+                                                </tr>
+                                            </thead>
+                                           
+                                            <tbody>
+                                                {%for cycle in billing_cycles %}
+                                                <tr>
+                                                    <td>{{forloop.counter}}</td>
+                                                    <td>{{cycle.client|title}}</td>
+                                                    <td>{{cycle.meter_number}}</td>
+                                                    <td>{{cycle.client.active_phone_number}}</td>
+                                                    <td>{{cycle.balance_carried_forward|intcomma}}</td>
+                                                    <td>{{cycle.amount_remaining|intcomma}}</td>
+                                                    <td><i class="fas fa-trash text-danger"></i></td>
+                                                    <td><a href="{% url 'core:update-client' cycle.client.id %}"><i
+                                                                class="fa fa-pen-square text-info"
+                                                                aria-hidden="true"></i></a></td>
+                                                    <td><a href="{% url 'core:client-dashboard' cycle.id %}"><i
+                                                                class="fas fa-folder-open text-success"></i></a></td>
+                                                </tr>
+                                                {% endfor %}
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="tab-pane fade show  profile-overview" id="add-new-client">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    NEW CLIENT FORM
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" class="row text-center" action="{% url 'core:add-new-client' %}">
+                                        {% csrf_token %}
+                                        <div class="col-md-12">
+        
+                                            
+                                                  {{form.full_name|as_crispy_field}}
+                                        </div>
+                                        <div class="col-md-6">
+        
+                                            
+                                            {{form.metre_number|as_crispy_field}}
+                                        </div>
+                                        <div class="col-md-6">
+        
+                                            
+                                            {{form.first_reading|as_crispy_field}}
+                                        </div>
+                                        <div class="col-md-6">
+        
+                                            
+                                            {{form.existing_balance|as_crispy_field}}
+                                        </div>
+                                        <div class="col-md-6">
+        
+                                            
+                                            {{form.active_phone_number|as_crispy_field}}
+                                        </div>
+                                        <div class="my-2"></div>
+                                        <button  type="submit" class="btn btn-success btn-icon-split">
+                                            <span class="icon text-white-50">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                            <span class="text">Create New Customer</span>
+                                        </button>
+                                    
+                                    </form>
+                                </div>
+                            </div>
+        
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<!-- Page level plugins -->
+<script src="{% static  'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+
+<!-- Page level custom scripts -->
+<script src="{%  static 'js/demo/datatables-demo.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $.noConflict();
+        var table = $('#dataTable').DataTable();
+    });</script>
+{% endblock content %}

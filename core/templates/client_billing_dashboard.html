@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+{% load static%}
+{% block css%}
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+{% endblock css %}
+ 
+{% block content %}
+
+
+{%include 'nav.html'%}
+<div id="content-wrapper" class="d-flex flex-column">
+
+    <!-- Main Content -->
+    <div id="content">
+
+        {% include 'topbar.html' %}
+       
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+            <!-- Page Heading -->
+            <!-- Page Heading -->
+            <h1 class="h3 mb-2 text-gray-800"> Billing Dashboard</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{%url 'core:client-list'%}">Clients</a></li>
+                    <li class="breadcrumb-item active"> Billing Dashboard</li>
+                </ol>
+            </nav>
+            {% comment %} <p class="mb-4">This is the selected client's dashboard.Here you can view the billing history,payment
+                history,you can fill in meter readings for the client.
+                After preparing the bill you can select another client to prepare the bill for.Everything including
+                units consumption ,total bill is computed by the system.
+            </p> {% endcomment %}
+
+            <div class="card">
+                <div class="card-body pt-3">
+                    <ul class="nav nav-tabs nav-tabs-bordered">
+
+                        <li class="nav-item">
+                            <button class="nav-link   active" data-toggle="tab" data-target="#billing-update"> <span
+                                    class="icon text-dark-50">
+                                    <i class="fa fa-user-tie"></i>
+                                </span>
+                                <span class="text">Client Overview</span></button>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <button class="nav-link" id="billing_history" data-toggle="tab" data-target="#billing-history"><span
+                                    class="icon text-dark-50">
+                                    <i class="fa fa-list"></i>
+                                </span>
+                                <span class="text">Billing History</span></button></button></button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-link" data-toggle="tab" data-target="#payment-history"><span
+                                    class="icon text-dark-50">
+                                    <i class="fa fa-money-bill-wave"></i>
+                                </span>
+                                <span class="text">Payment History</span></button></button> </button>
+                        </li>
+
+                    </ul>
+
+                    <div class="tab-content pt-2">
+
+
+
+                        <div class="tab-pane fade show active profile-overview" id="billing-update">
+                            <div class="row">
+                                <div class="col-xl-4 col-lg-5">
+                                    <div class="card shadow mb-4 border-0">
+                                        <!-- Card Header - Dropdown -->
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-success">Meter Reading Update for this
+                                                Bill</h6>
+                                        </div>
+                                        <!-- Card Body -->
+                                        <div class="card-body">
+                                            <form action="" method="post" id="meter-reading">
+
+                                                {% csrf_token %}
+                                                {{reading_form|crispy}}
+
+
+                                                <div class="form-group text-center">
+
+                                                    <button class="btn btn-outline-success" type="submit">UPDATE
+                                                        READING</button>
+                                                </div>
+                                            </form>
+                                            <div class="row">
+                                                <table class="table   mt-1" cellspacing="0" id="meter_reading_table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col"> Previous Reading</th>
+                                                            <th scope="col">Current Reading</th>
+                                                            <th scope="col">Units</th>
+                                                            <th scope="col"> Month </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for r in readings %}
+                                                        <tr>
+                                                            <td id="previous_reading">{{r.previous_reading}}</td>
+                                                            <td id="current_reading">{{r.current_reading}}</td>
+                                                            <td id="consumption"> {{r.consumption}} </td>
+                                                            <td id="month"> {{r.month}} </td>
+                                                        </tr>
+                                                        {% empty %}
+                                                        <tr>
+                                                            <td> No readings added. </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <hr>
+                                            Update the customer's consumption to update the clients billing details on
+                                            your right.<i class="fa fa-arrow-alt-circle-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-8 col-lg-7">
+
+                                    <!-- Area Chart -->
+                                    <div class="card shadow mb-4 border-0">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-success">Billing details of
+                                                {{bill_cycle.from_date}} to Endmonth </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="list-group">
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">Client Name</div>
+                                                    <span>{{bill_cycle.client}}</span>
+                                                </li>
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">Billing Cycle No</div>
+                                                    <span>{{bill_cycle.id}}</span>
+                                                </li>
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">Meter</div>
+                                                    <span> {{bill_cycle.meter_number}}</span>
+                                                </li>
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">Units</div>
+                                                    
+                                                    <span class="text-info fw-bold" id="units">
+                                                        {{bill_cycle.units|intcomma}}</span>
+
+                                                   
+                                                </li>
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto"> Unit Price </div>
+                                                    <span> KES {{bill_cycle.unit_price|intcomma}}</span>
+                                                </li>
+
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto"> Total Monthly Bill </div>
+                                                    <span id="total"> KES {{bill_cycle.total|intcomma}}</span>
+                                                </li>
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto"> Amount Paid </div>
+                                                    <span> KES {{bill_cycle.amount_paid|intcomma}}</span>
+                                                </li>
+                                                <li
+                                                    class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto"> Total Bill As Of Now </div>
+                                                    <span id="amount-remaining"> KES
+                                                        {{bill_cycle.amount_remaining|intcomma}}</span>
+                                                </li>
+
+
+
+
+
+                                            </ul>
+
+                                            <br>
+
+                                            <hr>
+                                            The values will auto update once you fill in the readings on your left.<i
+                                                class="fa fa-arrow-alt-circle-left"></i>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+
+
+                            </div>
+
+
+                        </div>
+                        <div class="tab-pane fade show  profile-overview" id="billing-history">
+
+
+                            <!-- DataTales Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-success">Client's Billing History</h6>
+                                </div>
+                                <div class="card-body container">
+                                    <div class="table-responsive">
+                                        <table class="table" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+
+                                                    <th>Metre Number</th>
+                                                    <th scope="col"> From </th>
+                                                    <th scope="col"> To </th>
+                                                    <th scope="col"> Previous Reading </th>
+                                                    <th scope="col"> Current Reading </th>
+                                                    <th scope="col"> Units </th>
+
+                                                    <th scope="col"> Units Bill </th>
+                                                    <th scope="col">Previous Month </th>
+                                                    <th scope="col"> Amount Paid </th>
+                                                    <th scope="col"> Amount Remaining </th>
+
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {%for cycle in billing_history %}
+                                                <tr>
+                                                    <td>{{forloop.counter}}</td>
+
+                                                    <td>{{cycle.meter_number}}</td>
+                                                    <td>{{cycle.from_date}}</td>
+                                                    <td>{{cycle.to_date}}</td>
+                                                    {% for reading in customer_readings %}
+                                                    {% if cycle == reading.parent %}
+                                                    <td> {{reading.previous_reading}} </td>
+                                                    <td>{{reading.current_reading}}</td>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    <td>{{cycle.units}}</td>
+
+                                                    <td>{{cycle.total|intcomma}}</td>
+                                                    <td>{{cycle.balance_carried_forward|intcomma}}</td>
+
+                                                    <td>{{cycle.amount_paid|intcomma}}</td>
+
+                                                    <td>
+                                                        {{cycle.amount_remaining|intcomma}} </td>
+
+                                                </tr>
+                                                {% endfor %}
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+                        </div>
+                        <div class="tab-pane fade show  profile-overview" id="payment-history">
+
+
+                            <!-- DataTales Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-success">Client's Payment History</h6>
+                                </div>
+                                <div class="card-body container">
+                                    <div class="table-responsive">
+                                        <table class="table" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th scope="col">Mpesa Code</th>
+                                                    <th scope="col"> First Name </th>
+                                                    <th scope="col"> Last Name </th>
+                                                    <th scope="col"> Phone Number </th>
+
+                                                    <th scope="col"> Amount </th>
+                                                    <th scope="col"> Account No</th>
+                                                    <th scope="col">Time Stamp</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {%for payment in all_customer_payments %}
+                                                <tr>
+                                                    <td>{{forloop.counter}}</td>
+
+                                                    <td>{{payment.description}}</td>
+                                                    <td>{{payment.first_name}}</td>
+                                                    <td>{{payment.last_name}}</td>
+                                                    <td>{{payment.phone_number}}</td>
+                                                    <td>{{payment.amount}}</td>
+
+
+                                                    <td>{{payment.reference}}</td>
+                                                    <td>{{payment.time}}</td>
+
+
+
+
+                                                </tr>
+                                                {% endfor %}
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a class="scroll-to-top rounded float-right" href="#page-top">
+            <i class="fas fa-angle-up"></i>
+          </a>
+    </div>
+    <!-- Content Row -->
+
+</div>
+</div>
+</div>
+{% block javascript %}
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<!-- Page level plugins -->
+<script src="{% static  'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+
+<!-- Page level custom scripts -->
+<script src="{%  static 'js/demo/datatables-demo.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $.noConflict();
+        var table = $('#dataTable').DataTable();
+    });</script>
+
+<script>
+   
+</script>
+<script>
+    /*
+        On submiting the form, send the POST ajax
+        request to server and after successfull submission
+        display the object.
+    */
+    $("#billing_history").click(function (e){
+       
+       e.preventDefault();
+       $.ajax({
+        type:'GET',
+     
+        url: "{% url 'core:client-dashboard' bill_cycle.id %}",
+        
+
+       })
+
+    })
+    previous_reading = document.getElementById("previous_reading")
+    current_reading = document.getElementById("current_reading")
+    consumption = document.getElementById("consumption")
+    month = document.getElementById("month")
+
+    units = document.getElementById("units")
+    total = document.getElementById("total")
+    amount_remaining = document.getElementById("amount-remaining")
+  
+    $("#meter-reading").submit(function (e) {
+        //preventing from page reload and default actions
+        e.preventDefault();
+        // serialize the data for sending the form data.]]
+        var serializedData = $(this).serialize();
+        // make POST ajax call
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'core:client-dashboard' bill_cycle.id %}",
+            data: serializedData,
+            success: function (response) {
+                // on successfull creating object
+                // 1. clear the form.
+                // $("#meter-reading").trigger('reset');
+                // 2. focus to nickname input 
+
+
+                // display the new read to table.
+                var instance = JSON.parse(response["instance"]);
+
+                var fields = instance[0]["fields"];
+
+
+                previous_reading.innerHTML = fields["previous_reading"]
+                current_reading.innerHTML = fields["current_reading"]
+                consumption.innerHTML = fields["consumption"]
+                month.innerHTML = fields["month"]
+                units.innerHTML = JSON.parse(response["units"]);
+                total.innerHTML = JSON.parse(response["total"]);
+                amount_remaining.innerHTML = JSON.parse(response["month_bill"]);
+
+
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+    })
+</script>
+{% endblock javascript %}
+{% endblock content %}

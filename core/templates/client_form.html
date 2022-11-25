@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}{%include 'nav.html'%}
+<div id="content-wrapper" class="d-flex flex-column">
+
+    <!-- Main Content -->
+    <div id="content">
+
+       {% include 'topbar.html' %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+             <!-- Page Heading -->
+           
+                <h1 class="h3 mb-0 text-gray-800">Add a new client</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                      <li class="breadcrumb-item active"><a href="#">Add New Client</a></li>
+                      
+                    </ol>
+                  </nav>
+                
+            
+             <!-- Content Row -->
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <!-- Default Card Example -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            NEW CLIENT FORM
+                        </div>
+                        <div class="card-body">
+                            <form method="post" class="row text-center">
+                                {% csrf_token %}
+                                <div class="col-md-12">
+
+                                    
+                                          {{form.full_name|as_crispy_field}}
+                                </div>
+                                <div class="col-md-6">
+
+                                    
+                                    {{form.metre_number|as_crispy_field}}
+                                </div>
+                                <div class="col-md-6">
+
+                                    
+                                    {{form.first_reading|as_crispy_field}}
+                                </div>
+                                <div class="col-md-6">
+
+                                    
+                                    {{form.existing_balance|as_crispy_field}}
+                                </div>
+                                <div class="col-md-6">
+
+                                    
+                                    {{form.active_phone_number|as_crispy_field}}
+                                </div>
+                                <div class="my-2"></div>
+                                <button  type="submit" class="btn btn-success btn-icon-split">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span class="text">Create New Customer</span>
+                                </button>
+                            
+                            </form>
+                        </div>
+                    </div>
+
+                   
+
+                </div>
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
