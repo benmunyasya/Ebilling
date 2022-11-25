@@ -226,7 +226,7 @@ def confirmation(request):
        
        
    
-    print(mpesa_payment)
+   
     payment.save()
     context = {
         "ResultCode": 0,
