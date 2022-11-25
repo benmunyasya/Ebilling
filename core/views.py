@@ -52,19 +52,21 @@ class ClientCreate(CreateView):
         return super(ClientCreate,self).form_valid(form)
 billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
 watermeters=WaterMeter.objects.all()
+all_clients=Client.objects.all()
 class MeterList(ListView):
     model=WaterMeter
-    context_object_name='watermeter_list'
+    context_object_name='water_meters'
     template_name='watermeter_list.html'
     def get_context_data(self, **kwargs):
-        context=super().get_context_data(**kwargs)
+        
 
         add_new_meter=addWaterMetreForm()
-
+        context=super().get_context_data(**kwargs)
         
-        context={
-            'form':add_new_meter
-            }
+        context['form']=add_new_meter
+        context['clients']=all_clients
+           
+       
         return context
 
 class  ClientList(ListView):
@@ -80,10 +82,9 @@ class  ClientList(ListView):
         client_form=addClientForm()
 
         context = super().get_context_data(**kwargs)
-        context={
-           'billing_cycles':billing_cycles,
-           'form':client_form
-           }
+        context['billing_cycles']=billing_cycles
+        context['form']=client_form
+       
         return context
 @login_required
 def home(request):

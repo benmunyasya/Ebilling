@@ -83,7 +83,7 @@
 
                                             <tbody>
                                                 
-                                                {% for meter in watermeter_list %}
+                                                {% for meter in water_meters %}
                                                 <tr>
                                                     <td>{{forloop.counter}}</td>
                                                     <td>{{meter}}</td>
@@ -91,7 +91,12 @@
                                                     <td><i class="fas fa-trash text-danger"></i></td>
                                                     <td><a href="#"><i class="fa fa-pen-square text-info"
                                                                 aria-hidden="true"></i></a></td>
-                                                    <td>Not Assigned</a></td>
+                                                    {% for client in clients %}
+                                                      {% if client.metre_number == meter %}
+                                                       <td class="text-light"> <span class="badge bg-success">Assigned </span></td>
+                                                      
+                                                       {% endif %}
+                                                    {% endfor %}
                                                 </tr>
                                                 {% endfor %}
 
