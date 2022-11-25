@@ -213,7 +213,7 @@ class   MpesaPayment(models.Model):
     transaction_no = models.CharField(default=uuid.uuid4, max_length=50, unique=True)
     phone_number = PhoneNumberField(null=True, blank=True)
     organization_balance = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
-    time=models.DateTimeField(blank=True, null=True,default=datetime.date.today)
+    time=models.DateTimeField(blank=True, null=True,auto_now_add=True)
     class Meta:
         verbose_name = 'Mpesa Payment'
         verbose_name_plural = 'Mpesa Payments'
