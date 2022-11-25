@@ -189,8 +189,8 @@ def register_urls(request):
     options = {"ShortCode": LipanaMpesaPassword.Test_c2b_shortcode,
                "ResponseType": "Completed",
                
-               "ValidationURL":   "https://e50e-41-81-176-195.ngrok.io/c2b/validation",
-               "ConfirmationURL": "https://e50e-41-81-176-195.ngrok.io/c2b/confirmation"}
+               "ValidationURL":   "https://billin.herokuapp.com/c2b/validation",
+               "ConfirmationURL": "https://billin.herokuapp.com/c2b/confirmation"}
     try:
 
         response = requests.post(api_url, json=options, headers=headers)
