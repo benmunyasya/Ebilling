@@ -25,7 +25,9 @@ billing_date=datetime(currentYear,currentMonth,8)
 due_date=datetime(currentYear,nextMonth,8)
 today_date=datetime(currentYear,currentMonth,currentDay)
 
-
+billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
+watermeters=WaterMeter.objects.all()
+all_clients=Client.objects.all()
 class WaterMetreCreate(CreateView):
     
     model=WaterMeter
@@ -50,9 +52,7 @@ class ClientCreate(CreateView):
 
         
         return super(ClientCreate,self).form_valid(form)
-billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
-watermeters=WaterMeter.objects.all()
-all_clients=Client.objects.all()
+
 class MeterList(ListView):
     model=WaterMeter
     context_object_name='water_meters'
@@ -213,7 +213,7 @@ def confirmation(request):
     mpesa_payment = json.loads(mpesa_body)
     payment = MpesaPayment(
         type=mpesa_payment['TransactionType'],
-        time=mpesa_payment['TransTime'],
+       
         first_name=mpesa_payment['FirstName'],
         reference=mpesa_payment['BillRefNumber'],
         description=mpesa_payment['TransID'],
