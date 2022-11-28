@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'core',
-    'africastalking',
+   
     'crispy_forms',
      'allauth',
     'allauth.account',
