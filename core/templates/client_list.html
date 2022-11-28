@@ -33,7 +33,7 @@
 
                 </ol>
             </nav>
-           
+
             <div class="card">
                 <div class="card-body pt-3">
                     <ul class="nav nav-tabs nav-tabs-bordered">
@@ -45,6 +45,14 @@
                                 </span>
                                 <span class="text">Client List</span></button>
                         </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-toggle="tab" data-target="#update-readings"><span
+                                    class="icon text-dark-50">
+                                    <i class="fa fa-receipt"></i>
+                                </span>
+                                <span class="text">Update Readings</span></button></button></button>
+                        </li>
+
 
 
                         <li class="nav-item">
@@ -67,36 +75,40 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-striped " id="dataTable" width="100%" cellspacing="0">
+                                        <table class="table list" id="dataTable" width="100%" cellspacing="0">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
-                                                    <th>Name</th>
                                                     <th>Metre Number</th>
-                                                    <th>Phone Number</th>
-                                                    <th>Balance C/F</th>
-                                                    <th>Current Bill</th>
+                                                    <th>Name</th>
+                                                   
+                                                    <th>Consumption</th>
+                                                    <th>Prev Balance</th>
+                                                   
+                                                    <th>Amount Paid</th>
+                                                    <th>Amount Due</th>
                                                     <th>Delete</th>
                                                     <th>Edit</th>
                                                     <th>View Details</th>
 
                                                 </tr>
                                             </thead>
-                                           
+
                                             <tbody>
-                                                {%for cycle in billing_cycles %}
+                                                {%for consumption in consumptions %}
                                                 <tr>
-                                                    <td>{{forloop.counter}}</td>
-                                                    <td>{{cycle.client|title}}</td>
-                                                    <td>{{cycle.meter_number}}</td>
-                                                    <td>{{cycle.client.active_phone_number}}</td>
-                                                    <td>{{cycle.balance_carried_forward|intcomma}}</td>
-                                                    <td>{{cycle.amount_remaining|intcomma}}</td>
+                                                    <td>{{consumption.parent.meter_number}}</td>
+                                                    <td>{{consumption.parent.client|title}}</td>
+                                                    <td>{{consumption.consumption}}</td>
+                                                   
+                                                    <td>{{consumption.parent.balance_carried_forward|intcomma}}</td>
+                                                   
+                                                    <td>{{consumption.parent.amount_paid|intcomma}}</td>
+                                                    <td>{{consumption.parent.amount_remaining|intcomma}}</td>
                                                     <td><i class="fas fa-trash text-danger"></i></td>
-                                                    <td><a href="{% url 'core:update-client' cycle.client.id %}"><i
+                                                    <td><a href="{% url 'core:update-client' consumption.parent.client.id %}"><i
                                                                 class="fa fa-pen-square text-info"
                                                                 aria-hidden="true"></i></a></td>
-                                                    <td><a href="{% url 'core:client-dashboard' cycle.id %}"><i
+                                                    <td><a href="{% url 'core:client-dashboard' consumption.parent.id %}"><i
                                                                 class="fas fa-folder-open text-success"></i></a></td>
                                                 </tr>
                                                 {% endfor %}
@@ -109,52 +121,125 @@
                             </div>
 
                         </div>
+                        <div class="tab-pane fade show  profile-overview" id="update-readings">
+                            <!-- DataTales Example -->
+                           
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Form 2A</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <form id='meter_readings' method="POST" name='readings'>
+                                            {% csrf_token %}
+                                            <table class="table list" id="dataTable" width="100%" cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Metre Number</th>
+                                                        <th>Name</th>
+
+
+                                                        <th>Previous Reading</th>
+                                                        <th>Current Reading</th>
+
+
+
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+
+
+                                                    {% for cycle in billing_cycles %}
+
+                                                    <tr>
+                                                        <td>{{cycle.meter_number}}</td>
+                                                        <td>{{cycle.client|title}}</td>
+
+
+
+                                                        {% for consumption in consumptions %}
+                                                        {%if consumption.parent == cycle %}
+
+                                                        <td>{{consumption.previous_reading}}</td>
+                                                        <td> <input name={{cycle}}
+                                                                value={{consumption.current_reading}}></td>
+
+                                                        {%endif%}
+                                                        {% endfor %}
+
+                                                    </tr>
+
+
+                                                    {% endfor %}
+                                                <tfoot>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td><input class="btn btn-outline-success" type="submit"></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tfoot>
+
+
+
+                                                        </tbody>
+
+                                            </table>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                         <div class="tab-pane fade show  profile-overview" id="add-new-client">
                             <div class="card mb-4">
                                 <div class="card-header">
                                     NEW CLIENT FORM
                                 </div>
                                 <div class="card-body">
-                                    <form method="post" class="row text-center" action="{% url 'core:add-new-client' %}">
+                                    <form method="post" class="row text-center"
+                                        action="{% url 'core:add-new-client' %}">
                                         {% csrf_token %}
                                         <div class="col-md-12">
-        
-                                            
-                                                  {{form.full_name|as_crispy_field}}
+
+
+                                            {{form.full_name|as_crispy_field}}
                                         </div>
                                         <div class="col-md-6">
-        
-                                            
+
+
                                             {{form.metre_number|as_crispy_field}}
                                         </div>
                                         <div class="col-md-6">
-        
-                                            
+
+
                                             {{form.first_reading|as_crispy_field}}
                                         </div>
                                         <div class="col-md-6">
-        
-                                            
+
+
                                             {{form.existing_balance|as_crispy_field}}
                                         </div>
                                         <div class="col-md-6">
-        
-                                            
+
+
                                             {{form.active_phone_number|as_crispy_field}}
                                         </div>
                                         <div class="my-2"></div>
-                                        <button  type="submit" class="btn btn-success btn-icon-split">
+                                        <button type="submit" class="btn btn-success btn-icon-split">
                                             <span class="icon text-white-50">
                                                 <i class="fas fa-check"></i>
                                             </span>
                                             <span class="text">Create New Customer</span>
                                         </button>
-                                    
+
                                     </form>
                                 </div>
                             </div>
-        
-                           
+
+
                         </div>
                     </div>
                 </div>
@@ -165,6 +250,7 @@
         </div>
     </div>
 </div>
+{% block javascript %}
 <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
 <!-- Page level plugins -->
 <script src="{% static  'vendor/datatables/jquery.dataTables.min.js' %}"></script>
@@ -175,6 +261,44 @@
 <script>
     $(document).ready(function () {
         $.noConflict();
-        var table = $('#dataTable').DataTable();
-    });</script>
+        var table = $('table.list').DataTable();
+
+    });
+
+</script>
+<script>
+    $("#meter_readings").submit(function (e) {
+        //preventing from page reload and default actions
+        //e.preventDefault();
+
+        // serialize the data for sending the form data.]]
+        var serializedData = $(this).serialize();
+        //console.log(serializedData)
+
+        // make POST ajax call
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'core:update-readings'  %}",
+            data: serializedData,
+
+
+            success: function (response) {
+                // on successfull creating object
+                // 1. clear the form.
+                // $("#meter-reading").trigger('reset');
+                // 2. focus to nickname input 
+                alert(response)
+
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+    })
+</script>
+
+
+{% endblock javascript %}
+
 {% endblock content %}

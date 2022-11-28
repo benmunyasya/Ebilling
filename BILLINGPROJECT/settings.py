@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'core',
+    'africastalking',
     'crispy_forms',
      'allauth',
     'allauth.account',
@@ -59,7 +60,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-]
+ ]
 
 ROOT_URLCONF = 'BILLINGPROJECT.urls'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -86,21 +87,21 @@ WSGI_APPLICATION = 'BILLINGPROJECT.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 import dj_database_url
 
-DATABASES = {
-    
-    }
-DATABASES['default'] =  dj_database_url.config()
 # DATABASES = {
-#      'default':  {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': 'WATERBILLING',
-#        'USER': 'postgres',
-#        'PASSWORD':'toor',
-#        'HOST': '127.0.0.1',
-#        'PORT': 5432,
+    
+#     }
+# DATABASES['default'] =  dj_database_url.config()
+DATABASES = {
+     'default':  {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': 'WATERBILLING',
+       'USER': 'postgres',
+       'PASSWORD':'toor',
+       'HOST': '127.0.0.1',
+       'PORT': 5432,
 
-#    }
-# }
+   }
+}
 PHONENUMBER_DEFAULT_REGION='KE'
 
 # Password validation

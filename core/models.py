@@ -67,23 +67,23 @@ class WaterBillingCycle(models.Model):
    
     
     meter_number = models.ForeignKey('WaterMeter', on_delete=models.CASCADE,null=True,blank=True)
-    amount_paid = models.DecimalField(
-        decimal_places=2, max_digits=9, default=0)
+    amount_paid = models.IntegerField(
+         default=0)
     
     
-    units = models.DecimalField(
-        decimal_places=2, max_digits=9, default=0, null=True, blank=True)
-    unit_price = models.DecimalField(
-        decimal_places=2, max_digits=9, verbose_name='Unit Price (KES)',default=145.0)
+    units = models.IntegerField(
+        default=0, null=True, blank=True)
+    unit_price = models.IntegerField(
+        verbose_name='Unit Price (KES)',default=120)
     
     balance_carried_forward=models.IntegerField(
-       default=100)
-    total = models.DecimalField(decimal_places=2, max_digits=9, default=0)
+       default=0)
+    total = models.IntegerField( default=0)
     due_date = models.DateField(default=due_date)
     
     month = models.CharField(choices=MONTHS_SELECT,default=MONTHS_SELECT[currentMonth], null=True, blank=True,max_length=10)
-    standing_charge = models.DecimalField(
-        decimal_places=2, max_digits=9, default=100)
+    standing_charge = models.IntegerField(
+        default=200)
     
   
     
@@ -126,11 +126,11 @@ class WaterBillingCycle(models.Model):
 class WaterConsumption(models.Model):
     parent = models.ForeignKey('WaterBillingCycle', on_delete=models.CASCADE,verbose_name='WaterBillingCycle.client')
     
-    previous_reading = models.DecimalField(max_digits=9, decimal_places=2)
-    current_reading = models.DecimalField(max_digits=9, decimal_places=2)
+    previous_reading = models.IntegerField()
+    current_reading = models.IntegerField()
    
-    consumption = models.DecimalField(
-        max_digits=9, decimal_places=2, default=0)
+    consumption = models.IntegerField(
+        default=0)
     month = models.CharField(choices=MONTHS_SELECT,max_length=10,null=True, blank=True,default=MONTHS_SELECT[currentMonth-1])
 
     def save(self, *args, **kwargs):

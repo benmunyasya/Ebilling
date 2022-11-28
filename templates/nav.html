@@ -54,36 +54,28 @@
 
     <!-- Nav Item - Utilities Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-            aria-expanded="true" aria-controls="collapseUtilities">
-            <i class="fa fa-phone"></i>
-            <span>Communication</span>
+        <a class="nav-link collapsed" href="{% url 'core:take-readings' %}" 
+           >
+            <i class="fa fa-clipboard-check"></i>
+            <span>Form 2A(Readings)</span>
         </a>
-        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-            data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Messages:</h6>
-                <a class="collapse-item" href="utilities-color.html">Open Comms Dashboard</a>
-                <a class="collapse-item" href="utilities-border.html">Send Bulk SMS</a>
-              
-            </div>
-        </div>
+       
     </li>
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePayments"
-            aria-expanded="true" aria-controls="collapsePayments">
-            <i class="fa fa-money-bill-wave"></i>
-            <span>Payments</span>
+        <a class="nav-link collapsed" href="{% url 'core:bill-records' %}" 
+           >
+            <i class="fa fa-file-invoice"></i>
+            <span>Form 2B(Bill Records)</span>
         </a>
-        <div id="collapsePayments" class="collapse" aria-labelledby="headingPayments"
-            data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Messages:</h6>
-                <a class="collapse-item" href="utilities-color.html">Open Payments Dashboard</a>
-                
-              
-            </div>
-        </div>
+       
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'core:send-bill-sms' %}" 
+            >
+            <i class="fa fa-envelope-open"></i>
+            <span>Bulk SMS & Notifications</span>
+        </a>
+        
     </li>
 
     <!-- Divider -->

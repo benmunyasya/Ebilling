@@ -130,8 +130,8 @@
                                     <!-- Area Chart -->
                                     <div class="card shadow mb-4 border-0">
                                         <div class="card-header py-3">
-                                            <h6 class="m-0 font-weight-bold text-success">Billing details of
-                                                {{bill_cycle.from_date}} to Endmonth </h6>
+                                            <h6 class="m-0 font-weight-bold text-success">Billing details of month
+                                                {{bill_cycle.month}} </h6>
                                         </div>
                                         <div class="card-body">
                                             <ul class="list-group">
@@ -219,17 +219,17 @@
                                         <table class="table data" id="dataTable" width="100%" cellspacing="0">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
+                                                  
 
                                                     <th>Metre Number</th>
-                                                    <th scope="col"> From </th>
-                                                    <th scope="col"> To </th>
+                                                   
+                                                    <th scope="col">Month</th>
                                                     <th scope="col"> Previous Reading </th>
                                                     <th scope="col"> Current Reading </th>
                                                     <th scope="col"> Units </th>
 
                                                     <th scope="col"> Units Bill </th>
-                                                    <th scope="col">Previous Month </th>
+                                                    <th scope="col">Previous Bal </th>
                                                     <th scope="col"> Amount Paid </th>
                                                     <th scope="col"> Amount Remaining </th>
 
@@ -238,28 +238,27 @@
                                             </thead>
 
                                             <tbody>
-                                                {%for cycle in billing_history %}
+                                                {% for reading in customer_readings %}
                                                 <tr>
-                                                    <td>{{forloop.counter}}</td>
+                                                   
 
-                                                    <td>{{cycle.meter_number}}</td>
-                                                    <td>{{cycle.from_date}}</td>
-                                                    <td>{{cycle.to_date}}</td>
-                                                    {% for reading in customer_readings %}
-                                                    {% if cycle == reading.parent %}
+                                                    <td>{{reading.parent.meter_number}}</td>
+                                                    <td>{{reading.parent.month}}</td>
+                                                   
+                                                   
+                                                    
                                                     <td> {{reading.previous_reading}} </td>
                                                     <td>{{reading.current_reading}}</td>
-                                                    {% endif %}
-                                                    {% endfor %}
-                                                    <td>{{cycle.units}}</td>
+                                                  
+                                                    <td>{{reading.consumption}}</td>
 
-                                                    <td>{{cycle.total|intcomma}}</td>
-                                                    <td>{{cycle.balance_carried_forward|intcomma}}</td>
+                                                    <td>{{reading.parent.total|intcomma}}</td>
+                                                    <td>{{reading.parent.balance_carried_forward|intcomma}}</td>
 
-                                                    <td>{{cycle.amount_paid|intcomma}}</td>
+                                                    <td>{{reading.parent.amount_paid|intcomma}}</td>
 
                                                     <td>
-                                                        {{cycle.amount_remaining|intcomma}} </td>
+                                                        {{reading.parent.amount_remaining|intcomma}} </td>
 
                                                 </tr>
                                                 {% endfor %}
@@ -364,9 +363,7 @@
         var table = $('table.data').DataTable();
     });</script>
 
-<script>
-   
-</script>
+
 <script>
     /*
         On submiting the form, send the POST ajax

@@ -11,8 +11,10 @@ from requests.auth import HTTPBasicAuth
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
+import requests
+from djqscsv import render_to_csv_response
 from .forms import addClientForm,addWaterMetreForm,WaterReadingForm
+from django.contrib import messages #import messages
 # Create your views here.
 from datetime import datetime
 from django.contrib import messages
@@ -25,9 +27,10 @@ billing_date=datetime(currentYear,currentMonth,8)
 due_date=datetime(currentYear,nextMonth,8)
 today_date=datetime(currentYear,currentMonth,currentDay)
 
-billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
+#billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
 watermeters=WaterMeter.objects.all()
 all_clients=Client.objects.all()
+
 class WaterMetreCreate(CreateView):
     
     model=WaterMeter
@@ -40,6 +43,7 @@ class WaterMetreCreate(CreateView):
 
         
         return super(WaterMetreCreate,self).form_valid(form)
+
 class ClientCreate(CreateView):
     
     model=Client
@@ -65,6 +69,7 @@ class MeterList(ListView):
         
         context['form']=add_new_meter
         context['clients']=all_clients
+
            
        
         return context
@@ -75,20 +80,24 @@ class  ClientList(ListView):
     template_name='client_list.html'
    
     
-
+  
     def get_context_data(self, **kwargs):
-       
+        
            
         client_form=addClientForm()
+        consumptions=WaterConsumption.objects.filter(month=currentMonth)
 
+        billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
         context = super().get_context_data(**kwargs)
         context['billing_cycles']=billing_cycles
         context['form']=client_form
+        context['consumptions']=consumptions
+        
        
         return context
 @login_required
 def home(request):
-   
+    billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
     billing_cycles_this_month=billing_cycles.count()
     water_meters=watermeters.count()
     context={
@@ -117,7 +126,8 @@ def client_dashboard(request,pk):
     all_billing_cycles=WaterBillingCycle.objects.filter(client_id=billing_cycle_current_month.client_id)
     readings = WaterConsumption.objects.filter(parent=billing_cycle_current_month).order_by('-month')
     all_customer_payments=MpesaPayment.objects.filter(reference='414170#{}'.format(str(client.metre_number)))
-    print(all_customer_payments)
+    #this months reading
+    reading= WaterConsumption.objects.get(parent=billing_cycle_current_month)
      #readings associated with this customer
     customer_readings=WaterConsumption.objects.all()
     customers_consumption=WaterConsumption.objects.filter(parent=billing_cycle_current_month).first()
@@ -161,6 +171,7 @@ def client_dashboard(request,pk):
         
     context={
         'client':client,
+        'reading':reading,
          'readings':readings,
         'bill_cycle':billing_cycle_current_month,
         'reading_form':reading_form,
@@ -169,6 +180,70 @@ def client_dashboard(request,pk):
          "all_customer_payments":all_customer_payments
         }
     return render(request,'client_billing_dashboard.html',context)
+def take_readings(request):
+    billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
+    consumptions=WaterConsumption.objects.filter(month=currentMonth)
+
+    context={}
+    context['billing_cycles']=billing_cycles
+ 
+    context['consumptions']=consumptions
+    return render(request,'form2a.html',context)
+
+def download_form2A(request):
+     consumptions=WaterConsumption.objects.filter(month=currentMonth).values('parent__meter_number','parent__client__full_name',
+     'previous_reading','current_reading','consumption')
+     return render_to_csv_response(consumptions,filename=f"Form 2A month-{currentMonth}")
+def bill_records(request):
+    billing_cycles=WaterBillingCycle.objects.filter(month=currentMonth)
+    consumptions=WaterConsumption.objects.filter(month=currentMonth)
+
+    context={}
+    context['billing_cycles']=billing_cycles
+ 
+    context['consumptions']=consumptions
+    return render(request,'form2b.html',context)
+def download_form2B(request):
+     consumptions=WaterConsumption.objects.filter(month=currentMonth).values('parent__meter_number','parent__client__full_name',
+     'previous_reading','current_reading','consumption','parent__balance_carried_forward','parent__total','parent__amount_paid')
+     return render_to_csv_response(consumptions,filename=f"Form 2A month-{currentMonth}")
+def updateBulkMeterReadings(request):
+    consumptions=WaterConsumption.objects.filter(month=currentMonth)
+
+    for i in consumptions:
+        if str(i.parent.id) in request.POST:
+            new_reading = request.POST[str(i.parent.id)]
+            i.current_reading = int(new_reading)
+            i.save()
+            billing_cycle_current_month=WaterBillingCycle.objects.get(id=i.parent.id)
+            bill_update=billing_cycle_current_month
+            bill_update.units = 0
+          
+            
+            if bill_update.units == 0:
+                bill_update.total = 0
+                
+            bill_update.units =  bill_update.units + i.consumption
+           
+            print(i.consumption)
+            bill_update.save(update_fields=['units','total'])
+           
+             
+    
+    
+    
+    return HttpResponse('All Readings have been updated successfully')
+def sending_bill_sms(request):
+    
+
+ 
+   
+    
+
+
+  
+    context={}
+    return render (request,'comms.html',context)
 def getAccessToken(request):
     consumer_key = 'qDHrMFeYU2Zp0sdGkda4q6mmhnHIBjZb'
     consumer_secret = 'wwMDwDgQA3L8bxwD'

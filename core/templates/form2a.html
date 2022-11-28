@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{%load static%}
+{% block content %}{%include 'nav.html'%}
+<div id="content-wrapper" class="d-flex flex-column">
+
+    <!-- Main Content -->
+    <div id="content">
+
+       {% include 'topbar.html' %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+             <!-- Page Heading -->
+             <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Take Meter Readings</h1>
+                <a href="{% url 'core:download2a' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                    class="fas fa-download fa-sm text-white-50"></i> Download FORM2A</a>
+            </div>
+             
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+                      <li class="breadcrumb-item active"><a href="#">Form 2A</a></li>
+                      
+                    </ol>
+                  </nav>
+                
+            
+             <!-- Content Row -->
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <!-- Default Card Example -->
+                  
+
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Put Down Meter Readings</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <form id='meter_readings' method="POST" name='readings'>
+                                        {% csrf_token %}
+                                        <table class="table list" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Metre Number</th>
+                                                    <th>Name</th>
+
+
+                                                    <th>Previous Reading</th>
+                                                    <th>Current Reading</th>
+
+
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+
+                                                {% for cycle in billing_cycles %}
+
+                                                <tr>
+                                                    <td>{{cycle.meter_number}}</td>
+                                                    <td>{{cycle.client|title}}</td>
+
+
+
+                                                    {% for consumption in consumptions %}
+                                                    {%if consumption.parent == cycle %}
+
+                                                    <td>{{consumption.previous_reading}}</td>
+                                                    <td> <input name={{cycle}}
+                                                            value={{consumption.current_reading}}></td>
+
+                                                    {%endif%}
+                                                    {% endfor %}
+
+                                                </tr>
+
+
+                                                {% endfor %}
+                                            <tfoot>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td><input class="btn btn-outline-success" type="submit"></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tfoot>
+
+
+
+                                                    </tbody>
+
+                                        </table>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+
+                </div>
+               
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<!-- Page level plugins -->
+<script src="{% static  'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+
+<!-- Page level custom scripts -->
+<script src="{%  static 'js/demo/datatables-demo.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $.noConflict();
+        var table = $('table.list').DataTable();
+
+    });
+
+</script>
+<script>
+    $("#meter_readings").submit(function (e) {
+        //preventing from page reload and default actions
+       // e.preventDefault();
+
+        // serialize the data for sending the form data.]]
+        var serializedData = $(this).serialize();
+        
+
+        // make POST ajax call
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'core:update-readings'  %}",
+            data: serializedData,
+
+
+            success: function (response) {
+                // on successfull creating object
+                // 1. clear the form.
+                // $("#meter-reading").trigger('reset');
+                // 2. focus to nickname input 
+                alert(response)
+
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+    })
+</script>
+
+
+{% endblock content %}
