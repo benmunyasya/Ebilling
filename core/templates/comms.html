@@ -29,8 +29,121 @@
             <!-- Content Row -->
             <div class="row">
                 <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body pt-3">
+                            <ul class="nav nav-tabs nav-tabs-bordered">
+                                <li class="nav-item">
+                                    <button class="nav-link active" data-toggle="tab" data-target="#new-message"><span
+                                            class="icon text-dark-50">
+                                            <i class="fa fa-indent"></i>
+                                        </span>
+                                        <span class="text">Send New Message</span></button></button></button>
+                                </li>
 
+                                <li class="nav-item">
+                                    <button class="nav-link" id="bills_dispatch" data-toggle="tab"
+                                        data-target="#bills-dispatch"><span class="icon text-dark-50">
+                                            <i class="fa fa-envelope"></i>
+                                        </span>
+                                        <span class="text">Dispatch This Month's Bill</span></button></button></button>
+                                </li>
+
+                                <li class="nav-item">
+                                    <button class="nav-link " data-toggle="tab" data-target="#outbox"> <span
+                                            class="icon text-dark-50">
+                                            <i class="fa fa-envelope-open-text"></i>
+                                        </span>
+                                        <span class="text">Outbox</span></button>
+                                </li>
+
+                            </ul>
+                            <div class="tab-content pt-2">
+                                <div class="tab-pane fade show active profile-overview" id="new-message">
+                                    <!-- Overview end-->
+                                 
+                                       
+                                                    <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                                                        <div class="card-body p-5">
+                                                            <form method="post" enctype="multipart/form-data">
+                                                                {% csrf_token %}
+                                                                {{ form|crispy }}
+                                                                <br />
+                                                                <div class="text-center">
+                                                                    <input class="btn btn-outline-success" type="submit"
+                                                                        name="submit" value="Send Message" />
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                              
+                                    
+
+
+                                </div>
+                                <div class="tab-pane fade show  profile-overview" id="outbox">
+                                    <!-- DataTales Example -->
+
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Sent Messages</h6>
+                                        </div>
+                                        <div class="card-body">
+
+                                            <div class="table-responsive">
+                                                <table class="table list table-striped table-hover">
+                                                    <caption> Sent SMS</caption>
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Ref.</th>
+                                                            <th scope="col">Subject</th>
+                                                            <th scope="col">Sent To</th>
+
+                                                            <th scope="col"> created </th>
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id='ourTable'>
+
+                                                        <tr>
+                                                            <th scope="row">83278732 </th>
+                                                            <td>Bill Notification</td>
+
+                                                            <td>All Clients</td>
+
+
+
+
+
+                                                            <td>Today </td>
+
+
+                                                        </tr>
+
+
+
+
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+
+
+
+
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                     <!-- Default Card Example -->
+                    
+
 
 
                 </div>
@@ -57,37 +170,6 @@
 
     });
 
-</script>
-<script>
-    $("#meter_readings").submit(function (e) {
-        //preventing from page reload and default actions
-        e.preventDefault();
-
-        // serialize the data for sending the form data.]]
-        var serializedData = $(this).serialize();
-        console.log(serializedData)
-
-        // make POST ajax call
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'core:update-readings'  %}",
-            data: serializedData,
-
-
-            success: function (response) {
-                // on successfull creating object
-                // 1. clear the form.
-                // $("#meter-reading").trigger('reset');
-                // 2. focus to nickname input 
-                console.log(response)
-
-            },
-            error: function (response) {
-                // alert the error if any error occured
-                alert(response["responseJSON"]["error"]);
-            }
-        })
-    })
 </script>
 
 

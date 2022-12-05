@@ -40,7 +40,8 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                   
+                                    <form id='bill-records' method="POST" name='bill-records'>
+                                        
                                         {% csrf_token %}
                                         <table class="table list" id="dataTable" width="100%" cellspacing="0">
                                             <thead>
@@ -75,7 +76,8 @@
                                                     <td> {{consumption.consumption}}</td>
                                                     <td> {{consumption.parent.balance_carried_forward}}</td>
                                                     <td> {{consumption.parent.amount_remaining}}</td>
-                                                    <td> {{consumption.parent.amount_paid}}</td>
+                                                    <td> <input name={{consumption.parent}}
+                                                        value={{consumption.parent.amount_paid}}></td>
 
                                                    
 
@@ -85,14 +87,25 @@
 
                                                 {% endfor %}
                                             
-
+                                                <tfoot>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td><input class="btn btn-outline-success" value="Update Bill Records" type="submit"></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                <tfoot>
 
 
                                                     </tbody>
 
                                         </table>
 
-                                    
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -121,7 +134,34 @@
     });
 
 </script>
+<script>
+    $("#bill-records").submit(function (e) {
+        //preventing from page reload and default actions
+       // e.preventDefault();
 
+        // serialize the data for sending the form data.]]
+        var serializedData = $(this).serialize();
+        
+
+        // make POST ajax call
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'core:update-bill-records'  %}",
+            data: serializedData,
+
+
+            success: function (response) {
+              
+                alert(response)
+
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+    })
+</script>
 
 
 {% endblock content %}

@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'core',
-   
+   'django_summernote',
     'crispy_forms',
      'allauth',
     'allauth.account',
@@ -67,7 +67,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR,'templates'),os.path.join(BASE_DIR,'core/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,12 +85,12 @@ WSGI_APPLICATION = 'BILLINGPROJECT.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-import dj_database_url
+#import dj_database_url
 
-DATABASES = {
+#DATABASES = {
     
-    }
-DATABASES['default'] =  dj_database_url.config()
+#    }
+#DATABASES['default'] =  dj_database_url.config()
 # DATABASES = {
 #      'default':  {
 #        'ENGINE': 'django.db.backends.postgresql',
@@ -102,6 +102,12 @@ DATABASES['default'] =  dj_database_url.config()
 
 #    }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 PHONENUMBER_DEFAULT_REGION='KE'
 
 # Password validation

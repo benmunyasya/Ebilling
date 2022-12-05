@@ -4,15 +4,18 @@ from django.dispatch import receiver
 
 from  .models import Client,WaterBillingCycle,WaterConsumption,MpesaPayment
 from datetime import datetime
-
-
 currentDay = datetime.now().day
 currentMonth = datetime.now().month
 currentYear = datetime.now().year
 prevMonth=currentMonth-1
-nextMonth=currentMonth+1
+
 billing_date=datetime(currentYear,currentMonth,8)
-due_date=datetime(currentYear,nextMonth,8)
+
+if currentMonth == 12:
+    nextMonth=currentMonth-11
+else:
+    nextMonth=currentMonth+1
+
 MONTHS_SELECT = [
     ('1','1'),
     ('1','2'),
@@ -31,9 +34,9 @@ MONTHS_SELECT = [
 @receiver(post_save,sender=Client)
 def create_billing_cycle(sender,created,instance,**kwargs):
     if created:
-            billling_cycle = WaterBillingCycle.objects.create(client=instance,meter_number=instance.metre_number,from_date="{}-{}-1".format(currentYear,currentMonth),
-                to_date=f"{currentYear}-{currentMonth}-28",due_date=due_date,month=currentMonth,balance_carried_forward=instance.existing_balance)
-            WaterConsumption.objects.create(parent=billling_cycle,previous_reading=instance.first_reading,current_reading=0.00,month = currentMonth )
+            billling_cycle = WaterBillingCycle.objects.create(client=instance,meter_number=instance.metre_number,
+                month=currentMonth,balance_carried_forward=instance.existing_balance)
+            WaterConsumption.objects.create(parent=billling_cycle,previous_reading=instance.first_reading,current_reading=0.00,month =str(currentMonth) )
            
 @receiver(post_save,sender=MpesaPayment)  
 def sync_Mpesa_Payment(sender,created,instance,**kwargs):   
